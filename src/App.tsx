@@ -11,6 +11,7 @@ import Shortlist from "./pages/Shortlist";
 import Proposal from "./pages/Proposal";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
+import ContractDetail from "./pages/ContractDetail";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/vaga/:id/shortlist" element={<Shortlist />} />
           <Route path="/vaga/:id/proposta" element={<Proposal />} />
           <Route path="/chat/:jobId" element={<Chat />} />
+          <Route path="/empresa/contratos/:id" element={<ContractDetail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

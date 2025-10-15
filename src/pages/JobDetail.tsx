@@ -6,15 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Briefcase, 
-  Calendar, 
-  DollarSign, 
-  ArrowLeft, 
+import {
+  Briefcase,
+  Calendar,
+  DollarSign,
+  ArrowLeft,
   Send,
   Users,
-  MessageSquare
+  MessageSquare,
 } from "lucide-react";
+import ModalContrato from "@/components/ModalContrato";
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -25,6 +26,8 @@ const JobDetail = () => {
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [hasProposal, setHasProposal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProposalId, setSelectedProposalId] = useState("");
 
   useEffect(() => {
     checkUser();
@@ -32,7 +35,9 @@ const JobDetail = () => {
   }, [id]);
 
   const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     setUser(session?.user ?? null);
     if (session?.user) {
       const { data: profile } = await supabase
@@ -40,7 +45,7 @@ const JobDetail = () => {
         .select("role")
         .eq("id", session.user.id)
         .single();
-      
+
       setUserRole(profile?.role || null);
 
       // Check if user already sent a proposal
@@ -51,7 +56,7 @@ const JobDetail = () => {
           .eq("job_id", id)
           .eq("freela_id", session.user.id)
           .single();
-        
+
         setHasProposal(!!data);
       }
     }
@@ -61,13 +66,15 @@ const JobDetail = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("jobs")
-      .select(`
+      .select(
+        `
         *,
         company:company_id(
           name,
           company_profiles(display_name, verified)
         )
-      `)
+      `
+      )
       .eq("id", id)
       .single();
 
@@ -75,13 +82,23 @@ const JobDetail = () => {
       toast({
         title: "Erro ao carregar vaga",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
       navigate("/");
     } else {
       setJob(data);
     }
     setLoading(false);
+  };
+
+  const handleAcceptProposal = (proposalId: string) => {
+    setSelectedProposalId(proposalId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProposalId("");
   };
 
   if (loading) {
@@ -101,7 +118,11 @@ const JobDetail = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate("/")} className="mb-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/")}
+            className="mb-2"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
           </Button>
@@ -117,15 +138,22 @@ const JobDetail = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Briefcase className="h-6 w-6 text-primary" />
-                    <Badge variant={job.status === "ATIVO" ? "default" : "secondary"}>
+                    <Badge
+                      variant={job.status === "ATIVO" ? "default" : "secondary"}
+                    >
                       {job.status}
                     </Badge>
                   </div>
                   <CardTitle className="text-3xl mb-3">{job.title}</CardTitle>
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <span>{job.company?.company_profiles?.[0]?.display_name || job.company?.name}</span>
+                    <span>
+                      {job.company?.company_profiles?.[0]?.display_name ||
+                        job.company?.name}
+                    </span>
                     {job.company?.company_profiles?.[0]?.verified && (
-                      <Badge variant="outline" className="text-xs">Verificada</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        Verificada
+                      </Badge>
                     )}
                   </div>
                 </div>
@@ -208,15 +236,19 @@ const JobDetail = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {(Array.isArray(job.skills) ? job.skills : []).map((skill: string) => (
-                  <Badge key={skill} variant="secondary">
-                    {skill}
-                  </Badge>
-                ))}
+                {(Array.isArray(job.skills) ? job.skills : []).map(
+                  (skill: string) => (
+                    <Badge key={skill} variant="secondary">
+                      {skill}
+                    </Badge>
+                  )
+                )}
               </div>
               {job.seniority && (
                 <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-2">Nível de Senioridade:</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Nível de Senioridade:
+                  </p>
                   <Badge>{job.seniority}</Badge>
                 </div>
               )}
@@ -233,7 +265,10 @@ const JobDetail = () => {
                       <Users className="h-4 w-4 mr-2" />
                       Ver Shortlist
                     </Button>
-                    <Button variant="outline" onClick={() => navigate(`/chat/${id}`)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate(`/chat/${id}`)}
+                    >
                       <MessageSquare className="h-4 w-4 mr-2" />
                       Chat
                     </Button>
@@ -255,6 +290,14 @@ const JobDetail = () => {
           </Card>
         </div>
       </main>
+
+      {selectedProposalId && (
+        <ModalContrato
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          proposalId={selectedProposalId}
+        />
+      )}
     </div>
   );
 };
