@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ChatBox } from "@/components/ChatBox";
+import ChatBox from "@/components/ChatBox";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 
@@ -19,12 +19,14 @@ const Chat = () => {
   }, [jobId]);
 
   const checkAccess = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       toast({
         title: "Acesso negado",
         description: "Você precisa estar logado.",
-        variant: "destructive"
+        variant: "destructive",
       });
       navigate("/auth");
       return;
@@ -42,7 +44,7 @@ const Chat = () => {
     if (!jobData) {
       toast({
         title: "Vaga não encontrada",
-        variant: "destructive"
+        variant: "destructive",
       });
       navigate("/");
       return;
@@ -52,7 +54,7 @@ const Chat = () => {
 
     // Check if user has access (is owner or has sent proposal)
     const isOwner = jobData.company_id === session.user.id;
-    
+
     if (!isOwner) {
       const { data: proposal } = await supabase
         .from("proposals")
@@ -65,7 +67,7 @@ const Chat = () => {
         toast({
           title: "Acesso negado",
           description: "Você precisa enviar uma proposta para acessar o chat.",
-          variant: "destructive"
+          variant: "destructive",
         });
         navigate(`/vaga/${jobId}`);
         return;
@@ -87,7 +89,11 @@ const Chat = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate(`/vaga/${jobId}`)} className="mb-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(`/vaga/${jobId}`)}
+            className="mb-2"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
           </Button>
@@ -96,7 +102,7 @@ const Chat = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <ChatBox threadId={jobId!} currentUserId={user.id} />
+        <ChatBox jobId={jobId!} />
       </main>
     </div>
   );

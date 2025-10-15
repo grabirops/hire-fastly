@@ -22,7 +22,7 @@ interface Job {
   };
 }
 
-const Index = () => {
+const Jobs = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,14 +35,16 @@ const Index = () => {
     checkUser();
     fetchJobs();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      } else {
-        setUserRole(null);
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchUserRole(session.user.id);
+        } else {
+          setUserRole(null);
+        }
       }
-    });
+    );
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -50,7 +52,9 @@ const Index = () => {
   }, []);
 
   const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     setUser(session?.user ?? null);
     if (session?.user) {
       await fetchUserRole(session.user.id);
@@ -81,18 +85,18 @@ const Index = () => {
       toast({
         title: "Erro ao carregar vagas",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
     } else {
-      const mappedJobs: Job[] = (data || []).map(job => ({
+      const mappedJobs: Job[] = (data || []).map((job) => ({
         id: job.id,
         title: job.title,
         description: job.description,
-        skills: Array.isArray(job.skills) ? job.skills as string[] : [],
+        skills: Array.isArray(job.skills) ? (job.skills as string[]) : [],
         model: job.model,
         budget: job.budget,
         deadline: job.deadline,
-        status: job.status
+        status: job.status,
       }));
       setJobs(mappedJobs);
     }
@@ -103,14 +107,17 @@ const Index = () => {
     await supabase.auth.signOut();
     toast({
       title: "Logout realizado",
-      description: "Você saiu da sua conta com sucesso."
+      description: "Você saiu da sua conta com sucesso.",
     });
   };
 
-  const filteredJobs = jobs.filter(job =>
-    job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredJobs = jobs.filter(
+    (job) =>
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.skills.some((skill) =>
+        skill.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   return (
@@ -210,4 +217,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Jobs;

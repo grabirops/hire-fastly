@@ -4,11 +4,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { Briefcase } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
 
 const Auth = () => {
   const [loading, setLoading] = useState(false);
@@ -18,9 +26,18 @@ const Auth = () => {
   const [role, setRole] = useState<"FREELA" | "EMPRESA">("FREELA");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreedToTerms) {
+      toast({
+        title: "Consentimento Necessário",
+        description: "Você deve aceitar os termos e a política de privacidade.",
+        variant: "destructive",
+      });
+      return;
+    }
     setLoading(true);
 
     const { data, error } = await supabase.auth.signUp({
@@ -29,10 +46,10 @@ const Auth = () => {
       options: {
         data: {
           name,
-          role
+          role,
         },
-        emailRedirectTo: `${window.location.origin}/`
-      }
+        emailRedirectTo: `${window.location.origin}/`,
+      },
     });
 
     setLoading(false);
@@ -41,12 +58,12 @@ const Auth = () => {
       toast({
         title: "Erro no cadastro",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
     } else if (data.user) {
       toast({
         title: "Cadastro realizado!",
-        description: "Você já pode fazer login."
+        description: "Você já pode fazer login.",
       });
       navigate("/");
     }
@@ -58,7 +75,7 @@ const Auth = () => {
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     });
 
     setLoading(false);
@@ -67,12 +84,12 @@ const Auth = () => {
       toast({
         title: "Erro no login",
         description: error.message,
-        variant: "destructive"
+        variant: "destructive",
       });
     } else {
       toast({
         title: "Login realizado!",
-        description: "Bem-vindo de volta."
+        description: "Bem-vindo de volta.",
       });
       navigate("/");
     }
@@ -136,9 +153,7 @@ const Auth = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Criar Conta</CardTitle>
-                <CardDescription>
-                  Junte-se ao FastFreela hoje
-                </CardDescription>
+                <CardDescription>Junte-se ao FastFreela hoje</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSignUp} className="space-y-4">
@@ -178,20 +193,60 @@ const Auth = () => {
                   </div>
                   <div className="space-y-2">
                     <Label>Você é...</Label>
-                    <RadioGroup value={role} onValueChange={(value) => setRole(value as "FREELA" | "EMPRESA")}>
+                    <RadioGroup
+                      value={role}
+                      onValueChange={(value) =>
+                        setRole(value as "FREELA" | "EMPRESA")
+                      }
+                    >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="FREELA" id="freela" />
-                        <Label htmlFor="freela" className="font-normal cursor-pointer">
+                        <Label
+                          htmlFor="freela"
+                          className="font-normal cursor-pointer"
+                        >
                           Freelancer
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="EMPRESA" id="empresa" />
-                        <Label htmlFor="empresa" className="font-normal cursor-pointer">
+                        <Label
+                          htmlFor="empresa"
+                          className="font-normal cursor-pointer"
+                        >
                           Empresa
                         </Label>
                       </div>
                     </RadioGroup>
+                  </div>
+                  <div className="flex items-center space-x-2 mt-4">
+                    <Checkbox
+                      id="terms"
+                      checked={agreedToTerms}
+                      onCheckedChange={(checked) =>
+                        setAgreedToTerms(checked as boolean)
+                      }
+                    />
+                    <label
+                      htmlFor="terms"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Eu li e aceito os{" "}
+                      <Link
+                        to="/termos"
+                        className="underline hover:text-primary"
+                      >
+                        Termos de Serviço
+                      </Link>{" "}
+                      e a{" "}
+                      <Link
+                        to="/privacidade"
+                        className="underline hover:text-primary"
+                      >
+                        Política de Privacidade
+                      </Link>
+                      .
+                    </label>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Criando conta..." : "Criar Conta"}

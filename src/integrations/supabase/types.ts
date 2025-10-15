@@ -520,6 +520,58 @@ export type Database = {
           }
         ];
       };
+      reviews: {
+        Row: {
+          author_id: string;
+          contract_id: string;
+          created_at: string | null;
+          id: string;
+          rating: number;
+          target_id: string;
+          text: string | null;
+        };
+        Insert: {
+          author_id: string;
+          contract_id: string;
+          created_at?: string | null;
+          id?: string;
+          rating: number;
+          target_id: string;
+          text?: string | null;
+        };
+        Update: {
+          author_id?: string;
+          contract_id?: string;
+          created_at?: string | null;
+          id?: string;
+          rating?: number;
+          target_id?: string;
+          text?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reviews_author_id_fkey";
+            columns: ["author_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reviews_contract_id_fkey";
+            columns: ["contract_id"];
+            isOneToOne: false;
+            referencedRelation: "contracts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reviews_target_id_fkey";
+            columns: ["target_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -547,6 +599,10 @@ export type Database = {
         };
       };
       update_updated_at: {
+        Args: Record<PropertyKey, never>;
+        Returns: unknown;
+      };
+      update_trust_score: {
         Args: Record<PropertyKey, never>;
         Returns: unknown;
       };

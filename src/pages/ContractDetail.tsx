@@ -15,13 +15,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import ReviewForm from "@/components/ReviewForm"; // Importando o novo componente
+import { useState } from "react";
+import { trackEvent } from "@/lib/posthog";
 
 // Mock data - replace with actual data fetching
 const contract = {
-  id: " uuid-contrato-1",
+  id: "uuid-contrato-1",
   title: "Desenvolvimento de E-commerce",
   freelancer: "João Silva",
-  status: "Ativo",
+  status: "CONCLUIDO", // Alterado para teste
   totalValue: 5000,
   startDate: "2024-01-10",
   endDate: "2024-03-10",
@@ -52,9 +55,20 @@ const milestones = [
 ];
 
 export default function ContractDetail() {
-  const handleGeneratePix = (milestoneId: string) => {
-    alert(`Gerando PIX para o milestone ${milestoneId}`);
+  const [hasReviewed, setHasReviewed] = useState(false); // Novo estado
+
+  const handleGeneratePix = async (milestoneId: string, value: number) => {
     // Aqui virá a lógica para chamar a API /api/milestones/checkout
+    // Ex: const response = await fetch('/api/milestones/checkout', ...)
+
+    // Supondo que a chamada foi bem-sucedida:
+    trackEvent("pix_payment_initiated", {
+      milestone_id: milestoneId,
+      contract_id: contract.id,
+      amount: value,
+    });
+
+    alert(`Gerando PIX para o milestone ${milestoneId}`);
   };
 
   const handleViewStatus = (milestoneId: string) => {
@@ -73,6 +87,11 @@ export default function ContractDetail() {
       default:
         return "default";
     }
+  };
+
+  const handleReviewSuccess = () => {
+    setHasReviewed(true);
+    alert("Avaliação enviada com sucesso!");
   };
 
   return (
@@ -142,7 +161,9 @@ export default function ContractDetail() {
                     {milestone.status === "Pendente" && (
                       <Button
                         size="sm"
-                        onClick={() => handleGeneratePix(milestone.id)}
+                        onClick={() =>
+                          handleGeneratePix(milestone.id, milestone.value)
+                        }
                       >
                         Gerar Pix
                       </Button>
@@ -161,6 +182,24 @@ export default function ContractDetail() {
               ))}
             </TableBody>
           </Table>
+
+          {contract.status === "CONCLUIDO" && !hasReviewed && (
+            <div className="mt-8 border-t pt-6">
+              <h3 className="text-xl font-semibold mb-4">Deixar Avaliação</h3>
+              <ReviewForm
+                contractId={contract.id}
+                onSubmitSuccess={handleReviewSuccess}
+              />
+            </div>
+          )}
+
+          {contract.status === "CONCLUIDO" && hasReviewed && (
+            <div className="mt-8 border-t pt-6 text-center">
+              <p className="text-lg text-green-600">
+                Obrigado pela sua avaliação!
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

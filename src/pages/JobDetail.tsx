@@ -16,6 +16,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import ModalContrato from "@/components/ModalContrato";
+import DOMPurify from "dompurify";
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -220,12 +221,15 @@ const JobDetail = () => {
           {/* Description */}
           <Card>
             <CardHeader>
-              <CardTitle>Descrição</CardTitle>
+              <CardTitle>Descrição da Vaga</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="whitespace-pre-wrap text-muted-foreground">
-                {job.description}
-              </p>
+              <div
+                className="prose dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(job.description),
+                }}
+              />
             </CardContent>
           </Card>
 

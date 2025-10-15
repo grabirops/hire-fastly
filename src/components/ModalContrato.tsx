@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useFieldArray, useForm } from "react-hook-form";
 import { TrashIcon } from "@radix-ui/react-icons";
+import { trackEvent } from "@/lib/posthog";
 
 type Milestone = {
   description: string;
@@ -57,10 +58,31 @@ export default function ModalContrato({
   });
 
   const onSubmit = async (data: ContractFormValues) => {
-    console.log({ ...data, proposalId });
-    // Lógica para chamar a API /api/contracts
-    // Ex: await fetch('/api/contracts', { method: 'POST', body: JSON.stringify({ ...data, proposal_id: proposalId }) });
-    onClose();
+    const response = await fetch("/api/contracts", {
+      method: "POST",
+      body: JSON.stringify({ ...data, proposal_id: proposalId }),
+    });
+
+    if (response.ok) {
+      const newContract = await response.json();
+
+      trackEvent("proposal_accepted", {
+        proposal_id: proposalId,
+        job_id: newContract.job_id,
+      });
+
+      trackEvent("contract_signed", {
+        contract_id: newContract.id,
+        job_id: newContract.job_id,
+        total_value: newContract.total_value,
+        num_milestones: data.milestones.length,
+      });
+
+      onClose();
+      // Opcional: navegar para a página do contrato
+    } else {
+      // Tratar erro
+    }
   };
 
   return (

@@ -46,6 +46,18 @@ serve(async (req) => {
         });
       }
 
+      // Disparar evento para o PostHog (simulado)
+      console.log("[PostHog Server Event]: pix_paid", {
+        distinct_id: payment.milestones.contracts.company_id, // Identifica o usuário
+        properties: {
+          payment_id: payment.id,
+          milestone_id: payment.milestones.id,
+          contract_id: payment.milestones.contracts.id,
+          gross_value: payment.gross_value,
+        },
+      });
+      // posthog.capture({ event: 'pix_paid', ... }) // Chamada real
+
       const { error: updatePaymentError } = await supabase
         .from("payments")
         .update({

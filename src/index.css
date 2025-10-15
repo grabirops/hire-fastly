@@ -18,10 +18,10 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 13% 18%;
 
-    /* Brand colors - Professional blue */
-    --primary: 217 91% 50%;
+    /* Brand colors - New blue palette */
+    --primary: 217 91% 60%; /* #3B82F6 - Azul-claro */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 45%;
+    --primary-hover: 217 91% 50%; /* #2563EB - Azul-médio */
 
     /* Success/Trust - Green accent */
     --secondary: 142 76% 36%;
@@ -32,7 +32,7 @@ All colors MUST be HSL.
     --muted-foreground: 220 9% 46%;
 
     --accent: 217 91% 95%;
-    --accent-foreground: 217 91% 50%;
+    --accent-foreground: 217 91% 50%; /* #2563EB - Azul-médio */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -40,7 +40,7 @@ All colors MUST be HSL.
     /* Borders & inputs */
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 217 91% 50%;
+    --ring: 217 91% 50%; /* #2563EB - Azul-médio */
 
     --radius: 0.5rem;
 
@@ -76,9 +76,9 @@ All colors MUST be HSL.
     --popover: 220 13% 15%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 217 91% 70%; /* Lighter blue for dark mode */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 55%;
+    --primary-hover: 217 91% 60%; /* #3B82F6 for dark mode hover */
 
     --secondary: 142 76% 42%;
     --secondary-foreground: 0 0% 100%;
@@ -88,14 +88,14 @@ All colors MUST be HSL.
     --muted-foreground: 220 9% 60%;
 
     --accent: 220 13% 20%;
-    --accent-foreground: 217 91% 60%;
+    --accent-foreground: 217 91% 60%; /* Lighter blue for dark mode */
 
     --destructive: 0 84% 65%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 13% 25%;
     --input: 220 13% 25%;
-    --ring: 217 91% 60%;
+    --ring: 217 91% 60%; /* Lighter blue for dark mode */
 
     --success: 142 76% 42%;
     --warning: 38 92% 55%;

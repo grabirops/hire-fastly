@@ -2,6 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star, MapPin, DollarSign } from "lucide-react";
+import VerificationBadge from "./VerificationBadge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface FreelaCardProps {
   name: string;
@@ -13,20 +19,27 @@ interface FreelaCardProps {
   trustScore?: number;
   rank: number;
   scoreExplanation?: Record<string, any>;
+  verifLevel?: number;
 }
 
-export const FreelaCard = ({ 
-  name, 
-  headline, 
-  skills, 
-  seniority, 
-  rateHour, 
-  location, 
+export const FreelaCard = ({
+  name,
+  headline,
+  skills,
+  seniority,
+  rateHour,
+  location,
   trustScore,
   rank,
-  scoreExplanation
+  scoreExplanation,
+  verifLevel,
 }: FreelaCardProps) => {
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -45,6 +58,10 @@ export const FreelaCard = ({
             {headline && (
               <p className="text-sm text-muted-foreground mt-1">{headline}</p>
             )}
+            <div className="flex items-center gap-2 mt-2">
+              <VerificationBadge level={verifLevel} />
+              <Badge variant="secondary">Score: {trustScore?.toFixed(1)}</Badge>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -58,9 +75,7 @@ export const FreelaCard = ({
         </div>
 
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          {seniority && (
-            <Badge variant="secondary">{seniority}</Badge>
-          )}
+          {seniority && <Badge variant="secondary">{seniority}</Badge>}
           {rateHour && (
             <div className="flex items-center gap-1">
               <DollarSign className="h-3 w-3" />
@@ -82,17 +97,39 @@ export const FreelaCard = ({
         </div>
 
         {scoreExplanation && (
-          <div className="text-xs text-muted-foreground bg-accent p-2 rounded">
-            <p className="font-medium mb-1">Match Score:</p>
-            <div className="space-y-1">
-              {Object.entries(scoreExplanation).map(([key, value]) => (
-                <div key={key} className="flex justify-between">
-                  <span>{key}:</span>
-                  <span className="font-medium">{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 text-sm font-semibold text-primary cursor-pointer">
+                <Star className="h-4 w-4" />
+                <span>{`Rank #${rank} (Score: ${(trustScore * 100).toFixed(
+                  0
+                )})`}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <div className="p-2 text-sm">
+                <p className="font-bold mb-2">Detalhes do Score:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {scoreExplanation?.semanticSimilarity && (
+                    <li>
+                      Similaridade Semântica:{" "}
+                      {(
+                        scoreExplanation.semanticSimilarity.value * 100
+                      ).toFixed(0)}
+                      %
+                    </li>
+                  )}
+                  {scoreExplanation?.skillMatch && (
+                    <li>
+                      Match de Skills:{" "}
+                      {(scoreExplanation.skillMatch.value * 100).toFixed(0)}%
+                    </li>
+                  )}
+                  {/* ... outros fatores */}
+                </ul>
+              </div>
+            </TooltipContent>
+          </Tooltip>
         )}
       </CardContent>
     </Card>
