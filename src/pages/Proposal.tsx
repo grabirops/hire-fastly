@@ -5,9 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Send } from "lucide-react";
+import { trackEvent } from "@/lib/posthog";
 
 const Proposal = () => {
   const { id } = useParams();
@@ -26,12 +33,14 @@ const Proposal = () => {
   }, [id]);
 
   const checkAccess = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       toast({
         title: "Acesso negado",
         description: "Você precisa estar logado.",
-        variant: "destructive"
+        variant: "destructive",
       });
       navigate("/auth");
       return;
@@ -47,7 +56,7 @@ const Proposal = () => {
       toast({
         title: "Acesso negado",
         description: "Apenas freelancers podem enviar propostas.",
-        variant: "destructive"
+        variant: "destructive",
       });
       navigate("/");
       return;
@@ -65,7 +74,7 @@ const Proposal = () => {
       toast({
         title: "Proposta já enviada",
         description: "Você já enviou uma proposta para esta vaga.",
-        variant: "destructive"
+        variant: "destructive",
       });
       navigate(`/vaga/${id}`);
       return;
@@ -84,55 +93,54 @@ const Proposal = () => {
     setJob(data);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!message.trim()) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, escreva uma mensagem.",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error("Usuário não autenticado.");
 
-    const proposalData: any = {
-      job_id: id,
-      freela_id: user.id,
-      message: message.trim()
-    };
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-proposal`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            job_id: id,
+            message: values.message,
+            price: values.price,
+            duration: values.duration,
+          }),
+        }
+      );
 
-    if (price) proposalData.price = parseFloat(price);
-    if (duration) proposalData.duration = duration;
-
-    const { error } = await supabase
-      .from("proposals")
-      .insert(proposalData);
-
-    setLoading(false);
-
-    if (error) {
-      if (error.code === "23505") {
-        toast({
-          title: "Proposta duplicada",
-          description: "Você já enviou uma proposta para esta vaga.",
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Erro ao enviar proposta",
-          description: error.message,
-          variant: "destructive"
-        });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Falha ao enviar proposta.");
       }
-    } else {
+
+      trackEvent("proposal_sent", {
+        job_id: id,
+        freela_id: session.user.id,
+      });
+
       toast({
         title: "Proposta enviada!",
-        description: "Sua proposta foi enviada com sucesso."
+        description: "Sua proposta foi enviada para a empresa.",
       });
       navigate(`/vaga/${id}`);
+    } catch (error: any) {
+      toast({
+        title: "Erro ao enviar proposta",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,7 +148,11 @@ const Proposal = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => navigate(`/vaga/${id}`)} className="mb-2">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(`/vaga/${id}`)}
+            className="mb-2"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
           </Button>
@@ -155,7 +167,8 @@ const Proposal = () => {
               <CardTitle>{job.title}</CardTitle>
               <CardDescription>
                 Modelos: {job.model === "FIXO" ? "Preço Fixo" : "Por Hora"}
-                {job.budget && ` | Orçamento: R$ ${job.budget.toLocaleString()}`}
+                {job.budget &&
+                  ` | Orçamento: R$ ${job.budget.toLocaleString()}`}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -165,7 +178,8 @@ const Proposal = () => {
           <CardHeader>
             <CardTitle>Sua Proposta</CardTitle>
             <CardDescription>
-              Você só pode enviar uma proposta por vaga. Certifique-se de incluir todas as informações.
+              Você só pode enviar uma proposta por vaga. Certifique-se de
+              incluir todas as informações.
             </CardDescription>
           </CardHeader>
           <CardContent>
