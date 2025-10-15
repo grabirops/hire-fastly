@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
+# FastFreela - Marketplace de Freelancers
 
-## Project info
+FastFreela é um marketplace moderno que conecta empresas e freelancers qualificados para projetos de tecnologia.
 
-**URL**: https://lovable.dev/projects/95567d1e-5d39-4c72-ab12-0b2acb520877
+## 🚀 Funcionalidades Implementadas (Sprint 1)
 
-## How can I edit this code?
+### Autenticação
+- ✅ Cadastro de usuários (Freelancer ou Empresa)
+- ✅ Login com email/senha
+- ✅ Gerenciamento de sessão
+- ✅ Auto-confirmação de email habilitada (ambiente de desenvolvimento)
 
-There are several ways of editing your application.
+### Vagas
+- ✅ Listagem pública de vagas ativas
+- ✅ Busca por título, descrição ou skills
+- ✅ Detalhes de cada vaga
+- ✅ Status e modelo de contratação (Fixo ou Por Hora)
 
-**Use Lovable**
+### Database Schema
+- ✅ Profiles (usuários com roles: FREELA, EMPRESA, ADMIN)
+- ✅ FreelancerProfiles (perfis de freelancers)
+- ✅ CompanyProfiles (perfis de empresas)
+- ✅ Jobs (vagas publicadas)
+- ✅ Proposals (propostas de freelancers)
+- ✅ Shortlist (candidatos shortlistados)
+- ✅ Messages (chat básico)
+- ✅ RLS policies configuradas
+- ✅ Triggers para timestamps
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/95567d1e-5d39-4c72-ab12-0b2acb520877) and start prompting.
+## 🎨 Design System
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Cores primárias**: Azul profissional (#2563EB) + Verde confiança (#16A34A)
+- **Tipografia**: System fonts com hierarquia clara
+- **Componentes**: Shadcn UI com customizações
+- **Responsivo**: Mobile-first approach
 
-**Use your preferred IDE**
+## 🛠️ Stack Tecnológica
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Frontend**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS + Shadcn UI
+- **Backend**: Lovable Cloud (Supabase)
+- **Database**: PostgreSQL com RLS
+- **Auth**: Supabase Auth
+- **Forms**: React Hook Form + Zod (ready for next sprint)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📋 Próximos Passos
 
-Follow these steps:
+### Para completar a Sprint 1:
+1. **Criar página de Nova Vaga** (empresas)
+2. **Página de Detalhes da Vaga** com botão de enviar proposta
+3. **Sistema de Shortlist** (geração fake com score)
+4. **Formulário de Proposta** (1 por freelancer/vaga)
+5. **Chat básico** com polling
+6. **Seed de dados** para testes
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Como Contribuir
+O projeto está preparado para receber as funcionalidades restantes. A arquitetura de banco, autenticação e design system já estão prontos.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🔐 Segurança
 
-# Step 3: Install the necessary dependencies.
-npm i
+- Row Level Security (RLS) habilitado em todas as tabelas
+- Policies configuradas por role
+- Validação de entrada (próxima sprint com Zod)
+- Auth seguro via Supabase
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## 📦 Como Usar
 
-**Edit a file directly in GitHub**
+1. Faça cadastro como Freelancer ou Empresa
+2. Explore as vagas disponíveis
+3. Use a busca para filtrar por skills
+4. (Em breve) Empresas poderão postar vagas
+5. (Em breve) Freelancers poderão enviar propostas
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🌐 Deploy
 
-**Use GitHub Codespaces**
+Este projeto está configurado para deploy automático no Lovable.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/95567d1e-5d39-4c72-ab12-0b2acb520877) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+**Status**: Sprint 1 - Core estrutura completa. Pronto para implementar funcionalidades de negócio.
